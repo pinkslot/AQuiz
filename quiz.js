@@ -263,6 +263,77 @@ var MatchQuestion = $.inherit(Question,
     },
 });
 
+var DialingQuestion = $.inherit(Question,
+{
+    __constructor: function (src) {
+        this.__base(src);
+        this.variants = [];
+        this.answer = [];
+        if (src.variants)
+            for (var i = 0; i < src.variants.length; ++i) {
+                this.variants.push(src.variants[i]);
+            }
+    },
+
+    ui: function () { return $('#dialing'); },
+
+    an: function () { return $('#dialing #dlAnswer'); },
+
+    va: function () { return $('#dialing #dlVariants'); },
+
+    show: function () {
+        this.__base();
+        this.makeVariants(this.va(), this.variants, function (elem, i, text) {
+            elem.attr('value', i).html(text).draggable({
+                connectToSortable: "#dlAnswer",
+                helper: "clone",
+            });
+        });
+
+        var that = this;
+        this.makeVariants(this.an(), this.answer, function (elem, i, text) {
+            elem.attr('value', text).html(that.variants[text]);
+        }).sortable({
+            dropOnEmpty: false,
+
+            over: function(e, ui) { 
+                ui.helper.removeClass('removable'); 
+            },
+
+            out: function(e, ui) { 
+                if (ui.helper)
+                    ui.helper.addClass('removable');  
+            },
+
+            beforeStop: function(e, ui) {
+                if (ui.helper.hasClass('removable')) {
+                    ui.item.remove();
+                }   
+            },
+        });
+    },
+
+    rememberAnswer: function () {
+        this.answer = $.map(this.an().children('li').not('.variantTemplate'), function (elem) { 
+            return elem.value; 
+        });
+    },
+
+    answerToText: function (answer) {
+        var that = this;        
+        return $.map(answer, function (elem) { return that.variants[elem]}).join(',');
+    },
+
+    isCorrect: function () {
+        if (this.correct.length != this.answer.length)
+            return false;
+        for (var i = 0; i < this.correct.length; ++i)
+            if (this.correct[i] != this.answer[i])
+                return false;
+        return true;
+    },
+});
+
 var Quiz = $.inherit(
 {
     __constructor: function (quizUrl) {
@@ -277,6 +348,7 @@ var Quiz = $.inherit(
             di: DirectInputQuestion,
             sr: SortableQuestion,
             mt: MatchQuestion,
+            dl: DialingQuestion,
         };
         $('#waiting').hide();
         this.currentQuestion = 0;
