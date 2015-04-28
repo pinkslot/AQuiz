@@ -37,3 +37,4 @@ table.bordered tr td, table.bordered tr th { border: 1px solid black; }
 
 div#checkAnswers table tr.correct { background-color: #40FF40; }
 div#checkAnswers table tr.wrong { background-color: #FF8080; }
+

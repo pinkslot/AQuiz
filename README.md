@@ -50,6 +50,7 @@ Each question is an object with the following keys:
 * `"variants"`: answer options/choices;
 * `"answer"`: *optional* answer given by student;
 * `"correct"`: *optional* correct answer.
+* `"langs"`: *optional* list of available programming languages.
 
 ##License
 
