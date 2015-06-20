@@ -7,6 +7,7 @@
     },
     "messages": {
         "confirmSubmit": "Finish testing and submit answers?",
-        "submitSuccess": "Answers submitted"
+        "submitSuccess": "Answers submitted",
+        "serverFail": "Server unavailable"
     }
 }

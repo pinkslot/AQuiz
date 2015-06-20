@@ -1,10 +1,6 @@
 function quiz_init(q) {
-    var args = parseArgs();
-    q.load(unescape(args.url));
+    var s =
+        new FileServer(q);
+        //new CatsServer(q);
+    s.load_quiz();
 }
-
-/*
-function quiz_submit_url() {
-    return 'ok.html';
-}
-*/

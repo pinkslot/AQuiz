@@ -18,19 +18,16 @@ but can also be used locally with hand-prepared test files.
 3. Copy `config.sample.js` to `config.js`, modify as required.
 4. (Optionally) configure your browser to allow local file access.
 
-To test, run `firefox quiz.xhtml?url=test.quiz`
+To test, run `firefox quiz.xhtml?load_url=test.quiz`
 
 ## Integration
-Configuration file `config.js` must define `quiz_init` function
-which should initialize a Quiz object passed to it.
-Simplest way to do that is by calling `load` function with some URL
-pointing to server-side automated testing system.
-You can also call `setQuestionsJSON` directly.
 
-If configuration also defines `quiz_submit_url` function,
+Configuration file `config.js` must define type of server, 
+now available local file server and [CATS](http://github.com/klenin/cats-main) server.
+
+If selected server defined `submit_answer` method,
 `Submit` button will be displayed in the UI.
-Pressing this button will generate a `POST` request to the URL returned by `quiz_submit_url`.
-The request will contain a single JSON array parameter `answers`.
+Pressing this button will call `submit_answer` with array of given answers.
 Each array element will be either student's
 answer to a quiz question or `null` if the question was not answered.
 

@@ -7,20 +7,6 @@
 
 "use strict";
 
-function parseArgs() {
-    var args = {};
-    $.each(document.location.search.substring(1).split(/[&;]/), function (i, s) {
-        if (s === '') return;
-        s = decodeURIComponent(s);
-        var np = s.indexOf('=', s);
-        if (np < 0)
-            args[s] = null;
-        else
-            args[s.substring(0, np)] = s.substring(np + 1);
-    });
-    return args;
-}
-
 var Question = $.inherit(
 {
     __constructor: function (src) {
@@ -81,7 +67,7 @@ var ChoiceQuestion = $.inherit(Question,
                 elem.children('label').html(text).attr('for', i + 1);
                 that.prepareVariant(elem, i, text);
             });
-        this.__base();        
+        this.__base();
     },
 });
 
@@ -328,7 +314,7 @@ var Quiz = $.inherit(
         this.questions = [];
     },
 
-    setQuestionsJSON: function (quizJSON) {
+    init: function (quizJSON) {
         var questionTypes = {
             sc: SingleChoiceQuestion,
             mc: MultiChoiceQuestion,
@@ -353,20 +339,6 @@ var Quiz = $.inherit(
         this.showQuestion();
     },
 
-    load: function (quizUrl) {
-        var that = this;
-        $.ajax({
-            url: quizUrl,
-            dataType: 'json',
-            timeout: 10000,
-            success: function (quizJSON) { that.setQuestionsJSON(quizJSON); },
-            error: function (req, textStatus, err) {
-                req.abort();
-                setTimeout(function (q, url) { q.load(url); }, 4000, that, quizUrl);
-            },
-        });
-    },
-
     updateAnswered: function (button, question) {
         if (question.answer !== null)
             button.addClass('answered');
@@ -387,7 +359,7 @@ var Quiz = $.inherit(
     },
 
     showCheckSumbitAnswers: function () {
-        if (typeof(quiz_submit_url) == 'function')
+        if (typeof(this.server.submit_answer) == 'function')
             $('#submitAnswersButton').show()[0].disabled = false;
         var show = false;
         for (var i = 0; i < this.questions.length && !show; ++i)
@@ -419,16 +391,13 @@ var Quiz = $.inherit(
     },
 
     submitAnswers: function () {
+        var that = this;
         this.leaveQuestion();
         if (confirm($('#confirmSubmit').text())) {
-            var answers = [];
-            $.each(this.questions, function (i, q) {
-                answers[i] = q.answer;
+            var ans = $.map(this.questions, function( q, i ) {
+                return JSON.stringify(q.answer + '');
             });
-            $.post(
-                quiz_submit_url(), { answers: JSON.stringify(answers) },
-                function () { alert($('#submitSuccess').text()); }
-            );
+            that.server.submit_answer(ans);
         }
         this.showQuestion();
     },
